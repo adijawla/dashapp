@@ -57,63 +57,142 @@ colors = {
     'text': '#7FDBFF'
 }
 
-
-
-
-
-
 app.layout = html.Div([
-    html.H4('HCIL Deck',style={
+    html.H4('HCIL Deck', style={
         'textAlign': 'right',
         'color': colors['text']}),
-    html.Img(src=app.get_asset_url('honda.png'),style={'textAlign': 'left','width':80,'height':80}),
-    html.Img(src=app.get_asset_url('ibm-security-logo.png'),style={'textAlign': 'left','width':80,'height':80}),
+    html.Img(src=app.get_asset_url('honda.png'), style={'textAlign': 'left', 'width': 80, 'height': 80}),
+    html.Img(src=app.get_asset_url('ibm-security-logo.png'), style={'textAlign': 'left', 'width': 80, 'height': 80}),
     dcc.Tabs([
         dcc.Tab(label='Proxy Dashboard', children=[
-             
-             
-             dcc.Dropdown(id='proxy-data-name',
-                         options=[{'label': s, 'value': s}
-                                  for s in data_dict.keys()],
-                         value='',
-                         multi=True,
-                         
-                         ),
-             html.Div(children=html.Div(id='graphs'), className='row')
-            
-        ], className="container", style={'color':colors['text'],'fontWeight': 'bold','backgroundColor': '#111111','width': '98%', 'margin-left': 10, 'margin-right': 10, 'max-width': 50000},
-           selected_style={'color':colors['text'],'fontWeight': 'bold','backgroundColor': '#111111'}  
-        )
-        
-    ])
-],style={'backgroundColor': colors['background']})
 
+            dcc.Dropdown(id='proxy-file-name',
+                         options=[{'label': j.split('.c')[0], 'value': j}
+                                  for j in pfiles],
+                         value='',
+                         multi=False,
+
+                         ),
+
+            html.Div(children=html.Div(id='graphs'), className='column'),
+
+        ], className="container",
+                style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111', 'width': '98%',
+                       'margin-left': 10, 'margin-right': 10, 'max-width': 50000},
+                selected_style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111'}
+                )
+
+
+
+        ], className='row', style={'color': colors['text'], 'backgroundColor': '#111111'},
+                selected_style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111'}
+                )])
+], className="container", style={'width': '98%', 'margin-left': 10, 'margin-right': 10, 'max-width': 50000,
+                                 'backgroundColor': colors['background']})
 
 
 @app.callback(
     dash.dependencies.Output('graphs', 'children'),
-    [dash.dependencies.Input('proxy-data-name', 'value')])
+    [dash.dependencies.Input('proxy-file-name', 'value')])
+def update_graph(pfile):
 
+    df = pd.read_csv(pfile)
+    cpu = df['CPU']
+    ram = df['RAM']
+    disk = df['Reporting/LoggingDisk']
+    bdw = df['Average in last minute(Bandwidth)']
+    txn = df['Average in last minute(Transactions per Second)']
+    con = df['Current total server connections']
+    times = df['TimeStamp']
 
-def update_graph(data_names):
-    graphs = []
+    data1 = go.Scatter(
+        x=times,
+        y=cpu,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
+    data2 = go.Scatter(
+        x=times,
+        y=ram,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
+    data3 = go.Scatter(
+        x=times,
+        y=disk,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
+    data4 = go.Scatter(
+        x=times,
+        y=bdw,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
+    data5 = go.Scatter(
+        x=times,
+        y=txn,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
+    data6 = go.Scatter(
+        x=times,
+        y=con,
+        mode='lines+markers',
+        line=dict(color='#f77b23'))
 
-    for data_name in data_names:
-        data = go.Scatter(
-            x=list(times),
-            y=list(data_dict[data_name]),
-            mode='lines+markers'
-        )
+    graphs = [html.Div(dcc.Graph(
+        id="data_name1",
+        animate=False,
+        figure={'data': [data1], 'layout': go.Layout(
+            title='{}'.format('CPUU'),
+            plot_bgcolor='#47260f',
+            paper_bgcolor=colors['background'],
+            font_color=colors['text']),
+                })),
+        html.Div(dcc.Graph(
+            id="data_name2",
+            animate=False,
+            figure={'data': [data2], 'layout': go.Layout(
+                title='{}'.format('RAM'),
+                plot_bgcolor='#47260f',
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']),
+                    }, className='col s12 m6 l4')),
+        html.Div(dcc.Graph(
+            id="data_name3",
+            animate=False,
+            figure={'data': [data3], 'layout': go.Layout(
+                title='{}'.format("DISK"),
+                plot_bgcolor='#47260f',
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']),
+                    }, className='col s12 m6 l4')),
+        html.Div(dcc.Graph(
+            id="data_name4",
+            animate=False,
+            figure={'data': [data4], 'layout': go.Layout(
+                title='{}'.format("Bandwidth"),
+                plot_bgcolor='#47260f',
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']),
+                    }, className='col s12 m6 l4')),
+        html.Div(dcc.Graph(
+            id="data_name5",
+            animate=False,
+            figure={'data': [data5], 'layout': go.Layout(
+                title='{}'.format('Transactions'),
+                plot_bgcolor='#47260f',
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']),
+                    }, className='col s12 m6 l4')),
+        html.Div(dcc.Graph(
+            id="data_name6",
+            animate=False,
+            figure={'data': [data6], 'layout': go.Layout(
+                title='{}'.format('Connections'),
+                plot_bgcolor='#47260f',
+                paper_bgcolor=colors['background'],
+                font_color=colors['text']),
+                    }, className='col s12 m6 l4'))
+    ]
+    return graphs
 
-        graphs.append(html.Div(dcc.Graph(
-            id=data_name,
-            animate=True,
-            figure={'data': [data], 'layout': go.Layout(
-                margin={'l': 50, 'r': 1, 't': 45, 'b': 1},
-                title='{}'.format(data_name),
-                plot_bgcolor='#DCDCDC')}
-        ), className='col s12 m6 l6'))
-        return  graphs
 
 if __name__ == '__main__':
     app.run_server(debug=True)
