@@ -1,140 +1,119 @@
 import pandas as pd
-import plotly.express as px
-
+from datetime import datetime, timedelta
 import dash
-import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+import plotly.graph_objs as go
+from plotly.subplots import make_subplots
+import os
+import glob
 
-app = dash.Dash(__name__)
+print('start')
+
+
+
+
+
+external_css = ["https://codepen.io/anon/pen/mardKv.css"]
+app = dash.Dash(__name__,external_stylesheets=external_css)
 server = app.server
+app.title = 'HCIL Deck'
 
-#---------------------------------------------------------------
-#Taken from https://www.ecdc.europa.eu/en/geographical-distribution-2019-ncov-cases
-df = pd.read_csv("COVID-19-geographic-disbtribution-worldwide-2020-03-29.csv")
 
-dff = df.groupby('countriesAndTerritories', as_index=False)[['deaths','cases']].sum()
-print (dff[:5])
-#---------------------------------------------------------------
+theme =  {
+    'dark': True,
+    'detail': '#007439',
+    'primary': '#00EA64',
+    'secondary': '#6E6E6E',
+}
+path = r'C:\Users\AdityaKumar\Desktop\Honda_Proxy_Automation\Raw_data\\'
+
+df = pd.read_csv('10.117.22.37_03052020.csv')
+
+
+
+
+cpu = df['CPU']
+ram = df['RAM']
+disk = df['Reporting/LoggingDisk']
+bdw = df['Average in last minute(Bandwidth)']
+txn = df['Average in last minute(Transactions per Second)']
+con = df['Current total server connections']
+times = df['TimeStamp'  ]
+
+
+from datetime import datetime as dt
+
+data_dict = {"CPU": cpu,
+             "RAM": ram,
+             "DISK": disk,
+             "Bandwidth": bdw,
+             "Transactions": txn,
+             "Connections": con}
+
+colors = {
+    'background': '#111111',
+    'text': '#7FDBFF'
+}
+
+
+
+
+
+
 app.layout = html.Div([
-    html.Div([
-        dash_table.DataTable(
-            id='datatable_id',
-            data=dff.to_dict('records'),
-            columns=[
-                {"name": i, "id": i, "deletable": False, "selectable": False} for i in dff.columns
-            ],
-            editable=False,
-            filter_action="native",
-            sort_action="native",
-            sort_mode="multi",
-            row_selectable="multi",
-            row_deletable=False,
-            selected_rows=[],
-            page_action="native",
-            page_current= 0,
-            page_size= 6,
-            # page_action='none',
-            # style_cell={
-            # 'whiteSpace': 'normal'
-            # },
-            # fixed_rows={ 'headers': True, 'data': 0 },
-            # virtualization=False,
-            style_cell_conditional=[
-                {'if': {'column_id': 'countriesAndTerritories'},
-                 'width': '40%', 'textAlign': 'left'},
-                {'if': {'column_id': 'deaths'},
-                 'width': '30%', 'textAlign': 'left'},
-                {'if': {'column_id': 'cases'},
-                 'width': '30%', 'textAlign': 'left'},
-            ],
-        ),
-    ],className='row'),
-
-    html.Div([
-        html.Div([
-            dcc.Dropdown(id='linedropdown',
-                options=[
-                         {'label': 'Deaths', 'value': 'deaths'},
-                         {'label': 'Cases', 'value': 'cases'}
-                ],
-                value='deaths',
-                multi=False,
-                clearable=False
-            ),
-        ],className='six columns'),
-
-        html.Div([
-        dcc.Dropdown(id='piedropdown',
-            options=[
-                     {'label': 'Deaths', 'value': 'deaths'},
-                     {'label': 'Cases', 'value': 'cases'}
-            ],
-            value='cases',
-            multi=False,
-            clearable=False
-        ),
-        ],className='six columns'),
-
-    ],className='row'),
-
-    html.Div([
-        html.Div([
-            dcc.Graph(id='linechart'),
-        ],className='six columns'),
-
-        html.Div([
-            dcc.Graph(id='piechart'),
-        ],className='six columns'),
-
-    ],className='row'),
+    html.H4('HCIL Deck',style={
+        'textAlign': 'right',
+        'color': colors['text']}),
+    html.Img(src=app.get_asset_url('honda.png'),style={'textAlign': 'left','width':80,'height':80}),
+    html.Img(src=app.get_asset_url('ibm-security-logo.png'),style={'textAlign': 'left','width':80,'height':80}),
+    dcc.Tabs([
+        dcc.Tab(label='Proxy Dashboard', children=[
+             
+             
+             dcc.Dropdown(id='proxy-data-name',
+                         options=[{'label': s, 'value': s}
+                                  for s in data_dict.keys()],
+                         value='',
+                         multi=True,
+                         
+                         ),
+             html.Div(children=html.Div(id='graphs'), className='row')
+            
+        ], className="container", style={'color':colors['text'],'fontWeight': 'bold','backgroundColor': '#111111','width': '98%', 'margin-left': 10, 'margin-right': 10, 'max-width': 50000},
+           selected_style={'color':colors['text'],'fontWeight': 'bold','backgroundColor': '#111111'}  
+        )
+        
+    ])
+],style={'backgroundColor': colors['background']})
 
 
-])
 
-#------------------------------------------------------------------
 @app.callback(
-    [Output('piechart', 'figure'),
-     Output('linechart', 'figure')],
-    [Input('datatable_id', 'selected_rows'),
-     Input('piedropdown', 'value'),
-     Input('linedropdown', 'value')]
-)
-def update_data(chosen_rows,piedropval,linedropval):
-    if len(chosen_rows)==0:
-        df_filterd = dff[dff['countriesAndTerritories'].isin(['China','Iran','Spain','Italy'])]
-    else:
-        print(chosen_rows)
-        df_filterd = dff[dff.index.isin(chosen_rows)]
-
-    pie_chart=px.pie(
-            data_frame=df_filterd,
-            names='countriesAndTerritories',
-            values=piedropval,
-            hole=.3,
-            labels={'countriesAndTerritories':'Countries'}
-            )
+    dash.dependencies.Output('graphs', 'children'),
+    [dash.dependencies.Input('proxy-data-name', 'value')])
 
 
-    #extract list of chosen countries
-    list_chosen_countries=df_filterd['countriesAndTerritories'].tolist()
-    #filter original df according to chosen countries
-    #because original df has all the complete dates
-    df_line = df[df['countriesAndTerritories'].isin(list_chosen_countries)]
+def update_graph(data_names):
+    graphs = []
 
-    line_chart = px.line(
-            data_frame=df_line,
-            x='dateRep',
-            y=linedropval,
-            color='countriesAndTerritories',
-            labels={'countriesAndTerritories':'Countries', 'dateRep':'date'},
-            )
-    line_chart.update_layout(uirevision='foo')
+    for data_name in data_names:
+        data = go.Scatter(
+            x=list(times),
+            y=list(data_dict[data_name]),
+            mode='lines+markers'
+        )
 
-    return (pie_chart,line_chart)
-
-#------------------------------------------------------------------
+        graphs.append(html.Div(dcc.Graph(
+            id=data_name,
+            animate=True,
+            figure={'data': [data], 'layout': go.Layout(
+                margin={'l': 50, 'r': 1, 't': 45, 'b': 1},
+                title='{}'.format(data_name),
+                plot_bgcolor='#DCDCDC')}
+        ), className='col s12 m6 l6'))
+        return  graphs
 
 if __name__ == '__main__':
     app.run_server(debug=True)
