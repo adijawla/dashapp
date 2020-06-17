@@ -29,7 +29,10 @@ theme =  {
 }
 path = r'C:\Users\AdityaKumar\Desktop\Honda_Proxy_Automation\Raw_data\\'
 
-pfiles = ['10.117.22.37_03052020.csv']
+pfiles = glob.glob('*.csv')
+pfiles.sort(key=os.path.getmtime)
+
+#pfiles = ['10.117.22.37_03052020.csv']
 
 
 colors = {
