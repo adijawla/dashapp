@@ -29,28 +29,8 @@ theme =  {
 }
 path = r'C:\Users\AdityaKumar\Desktop\Honda_Proxy_Automation\Raw_data\\'
 
-df = pd.read_csv('10.117.22.37_03052020.csv')
+pfiles = '10.117.22.37_03052020.csv'
 
-
-
-
-cpu = df['CPU']
-ram = df['RAM']
-disk = df['Reporting/LoggingDisk']
-bdw = df['Average in last minute(Bandwidth)']
-txn = df['Average in last minute(Transactions per Second)']
-con = df['Current total server connections']
-times = df['TimeStamp'  ]
-
-
-from datetime import datetime as dt
-
-data_dict = {"CPU": cpu,
-             "RAM": ram,
-             "DISK": disk,
-             "Bandwidth": bdw,
-             "Transactions": txn,
-             "Connections": con}
 
 colors = {
     'background': '#111111',
