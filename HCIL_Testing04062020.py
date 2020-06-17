@@ -80,13 +80,9 @@ app.layout = html.Div([
                 style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111', 'width': '98%',
                        'margin-left': 10, 'margin-right': 10, 'max-width': 50000},
                 selected_style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111'}
-                )
+                ),
 
-
-
-        ], className='row', style={'color': colors['text'], 'backgroundColor': '#111111'},
-                selected_style={'color': colors['text'], 'fontWeight': 'bold', 'backgroundColor': '#111111'}
-                )])
+        ])
 ], className="container", style={'width': '98%', 'margin-left': 10, 'margin-right': 10, 'max-width': 50000,
                                  'backgroundColor': colors['background']})
 
