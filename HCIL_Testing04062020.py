@@ -5,10 +5,16 @@ import dash_table
 import dash_core_components as dcc
 import dash_html_components as html
 from dash.dependencies import Input, Output
+
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
 import os
 import glob
+
+external_css = ["https://codepen.io/anon/pen/mardKv.css"]
+app = dash.Dash(__name__,external_stylesheets=external_css)
+server = app.server
+app.title = 'HCIL Deck'
 
 print('start')
 
@@ -172,9 +178,7 @@ pfiles = glob.glob('*.csv')
 pfiles.sort(key=os.path.getmtime)
 
 
-external_css = ["https://codepen.io/anon/pen/mardKv.css"]
-app = dash.Dash(__name__,external_stylesheets=external_css)
-app.title = 'HCIL Deck'
+
 
 app.layout = html.Div([
     html.H4('HCIL Deck',style={
@@ -308,5 +312,4 @@ def update_graph(data_names,pfile):
     
 
 if __name__ == '__main__':
-    app.run_server(debug=True, dev_tools_ui=True, dev_tools_props_check=False)
-    # app.run_server(debug=True)             
+     app.run_server(debug=True)
