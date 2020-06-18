@@ -3,7 +3,7 @@ from datetime import datetime, timedelta
 import dash
 import dash_core_components as dcc
 import dash_html_components as html
-#import dash_auth
+import dash_auth
 from dash.dependencies import Input, Output
 import plotly.graph_objs as go
 from plotly.subplots import make_subplots
@@ -12,19 +12,26 @@ import glob
 
 print('start')
 
-
-# VALID_USERNAME_PASSWORD_PAIRS = {
-#     'hello': 'world'
-# }
-
-
-
-
+VALID_USERNAME_PASSWORD_PAIRS = {
+    'hello': 'world'
+}
 
 external_css = ["https://codepen.io/anon/pen/mardKv.css"]
 app = dash.Dash(__name__,external_stylesheets=external_css)
 server = app.server
 app.title = 'HCIL Deck'
+
+auth = dash_auth.BasicAuth(
+    app,
+    VALID_USERNAME_PASSWORD_PAIRS
+)
+
+
+
+# external_css = ["https://codepen.io/anon/pen/mardKv.css"]
+# app = dash.Dash(__name__,external_stylesheets=external_css)
+# server = app.server
+# app.title = 'HCIL Deck'
 # auth = dash_auth.BasicAuth(
 #     app,
 #     VALID_USERNAME_PASSWORD_PAIRS
@@ -129,7 +136,7 @@ def update_graph(pfile):
         id="data_name1",
         animate=False,
         figure={'data': [data1], 'layout': go.Layout(
-            title='{}'.format('CPUU'),
+            title='{}'.format('CPU'),
             plot_bgcolor='#47260f',
             paper_bgcolor=colors['background'],
             font_color=colors['text']),
