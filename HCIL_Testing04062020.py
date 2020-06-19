@@ -13,7 +13,7 @@ import glob
 print('start')
 
 VALID_USERNAME_PASSWORD_PAIRS = {
-    'hello': 'world'
+    'admin': 'H0nd@$123'
 }
 
 external_css = ["https://codepen.io/anon/pen/mardKv.css"]
