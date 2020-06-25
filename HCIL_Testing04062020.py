@@ -59,7 +59,7 @@ colors = {
 
 app.layout = html.Div([
     html.H4('HCIL Deck', style={
-        'textAlign': 'right',
+        'textAlign': 'center',
         'color': colors['text']}),
     html.Img(src=app.get_asset_url('honda.png'), style={'textAlign': 'left', 'width': 80, 'height': 80}),
     html.Img(src=app.get_asset_url('ibm-security-logo.png'), style={'textAlign': 'left', 'width': 80, 'height': 80}),
